@@ -1,0 +1,52 @@
+{
+  "name": "DowntownHustle",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "LifeSimRemotes": {
+        "CashUpdate": {
+          "$className": "RemoteEvent"
+        },
+        "MissionUpdate": {
+          "$className": "RemoteEvent"
+        },
+        "$className": "Folder",
+        "VehicleInput": {
+          "$className": "RemoteEvent"
+        },
+        "MissionAction": {
+          "$className": "RemoteEvent"
+        },
+        "JobAction": {
+          "$className": "RemoteEvent"
+        },
+        "InventoryAction": {
+          "$className": "RemoteEvent"
+        },
+        "ObjectiveAction": {
+          "$className": "RemoteEvent"
+        }
+      },
+      "$className": "ReplicatedStorage"
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "$path": "src/ServerScriptService"
+    },
+    "StarterGui": {
+      "$className": "StarterGui",
+      "$properties": {
+        "ScreenOrientation": "Sensor"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "GameClient": {
+          "$path": "src/StarterPlayer/StarterPlayerScripts/GameClient.client.lua"
+        },
+        "$className": "StarterPlayerScripts"
+      },
+      "$className": "StarterPlayer"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+"""Exercise the actual JobService module with isolated Roblox substitutes."""
+from pathlib import Path
+
+from luau_runner import run_luau
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def main():
+    module = (ROOT / "src/ServerScriptService/JobService.lua").read_text(encoding="utf-8")
+    checks = (ROOT / "tests/jobs.lua").read_text(encoding="utf-8")
+    return run_luau(f"local function makeModule(game, typeof, math)\n{module}\nend\n{checks}", "jobs.lua")
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
