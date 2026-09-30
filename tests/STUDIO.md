@@ -1,5 +1,11 @@
 # Verificação no Roblox Studio
 
+## Situação da revisão documental — 30/09/2026
+
+A compilação, as **132 verificações com mocks em sete suítes** (incluindo 17 de veículos) e a geração pelo Rojo passaram nesta revisão. O arquivo gerado não contém `VehicleUnits`, apesar de o cliente e o serviço de veículos exigirem esse módulo. O mapeamento precisa ser corrigido antes de repetir os testes de Play em uma importação limpa. Consulte o [README](../README.md).
+
+As seções abaixo preservam os relatos técnicos de sessões anteriores. Seus números e resultados são registros históricos, não uma execução atual confirmada. As capturas mencionadas em `build/` não estão versionadas; a pasta é ignorada pelo Git. Nesta revisão não foram executados Roblox Studio, física, multiplayer ou persistência real.
+
 ## Evidências da expansão — 15/09/2026
 
 A compilação, os **127 testes com mocks em sete suítes** e a geração de `build/DowntownHustle.rbxlx` passaram com a expansão brasileira. O build inclui os 12 casos de `python tests/run_vehicles.py`, cobrindo catálogo, autorização, direção em rampas e ciclo de vida do serviço. Os executores usam temporários em `build/tests`, com limpeza ao terminar. Mocks não simulam física, rede ou controles de assento da engine.
@@ -16,7 +22,7 @@ A expansão acrescenta 71 casas e comércios nos bairros e morros, feira, mirant
 | Marcar a garagem | O clique em **Marcar** na linha da garagem mudou o indicador para esse destino, com direção e distância. |
 | Frota em repouso | Consulta confirmou dez veículos de sete modelos. Em todos, o chassi era a raiz física e `UpVector.Y > 0.9`, indicando que estavam em pé. Entrada e direção ainda não foram verificadas nesta rodada. |
 
-Capturas dessa rodada: [mapa e check](../build/studio-expansion-check.png), [aba Cidade](../build/studio-city-hud.png) e [preparação para dirigir](../build/studio-drive-ready.png).
+Capturas dessa rodada: mapa e check (`../build/studio-expansion-check.png`, arquivo local não versionado), aba Cidade (`../build/studio-city-hud.png`, arquivo local não versionado) e preparação para dirigir (`../build/studio-drive-ready.png`, arquivo local não versionado).
 
 **Pendente na engine:** entrada e direção dos sete modelos atuais, percursos completos pelos bairros e ladeiras, colisões e controles por toque da aba Cidade e dos veículos. As consultas de geometria, HUD e frota acima delimitam a cobertura confirmada; não equivalem a testar esses percursos ou a física com motorista.
 
