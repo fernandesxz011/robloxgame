@@ -1,8 +1,29 @@
 # Downtown Hustle
 
-Protótipo de jogo para Roblox, feito em Luau, com cidade, empregos, veículos, dinheiro e reputação.
+Protótipo de simulação urbana para **Roblox**, desenvolvido em **Luau**. O jogador explora uma cidade, realiza trabalhos e entregas, administra dinheiro e energia e avança por objetivos de primeiros passos.
 
-## O que já vem pronto
+O projeto reúne lógica de jogo no servidor, interface no cliente, persistência com DataStore e um fluxo local de compilação e testes integrado ao **Rojo**. É um projeto de portfólio em desenvolvimento; publicação e operação em produção não estão comprovadas no repositório.
+
+## Visão técnica
+
+| Camada | Responsabilidade e evidência |
+| --- | --- |
+| Servidor | `GameServer.server.lua` integra a cidade e os serviços de empregos, inventário, moradia, objetivos e veículos. Recompensas e verificações de estado ficam no servidor. |
+| Cliente | `GameClient.client.lua` implementa HUD, abas, orientação de destinos e envio de ações por RemoteEvents. |
+| Persistência | `PlayerData.lua` usa `UpdateAsync`, normalização de dados, reserva de sessão e salvamento periódico. O modo de teste sem API mantém dados apenas na sessão do Studio. |
+| Sistemas | Empregos com duração e cancelamento, economia com carteira/banco, entregas, apartamento, lanches e objetivos com resgate único. |
+| Veículos | Catálogo e serviço próprios, controle validado pelo motorista, limites numéricos e físicos sob autoridade do servidor. A física real ainda exige validação no Studio. |
+| Ferramentas | Rojo mapeia arquivos para o projeto Roblox; PowerShell coordena compilação e build; Python executa sete suítes Luau com mocks. |
+
+**Validação local em 30/09/2026:** compilação Luau, **132 verificações nas sete suítes** e geração do arquivo pelo Rojo concluídas. Os testes simulam objetos Roblox; não executam a engine, rede ou DataStore real.
+
+**Pendência de integração:** `src/ReplicatedStorage/VehicleUnits.lua` é exigido pelo cliente e pelo serviço de veículos, mas `default.project.json` não mapeia esse módulo. A ausência foi confirmada no arquivo gerado pelo Rojo; em uma importação limpa, os scripts podem ficar aguardando `WaitForChild("VehicleUnits")`. Corrigir o mapeamento e validar o Play é necessário antes de considerar o protótipo executável na plataforma. A revisão documental preservou o código e a configuração.
+
+## Desenvolvimento assistido por IA
+
+Utilizo IA como apoio à prototipação, pesquisa, desenvolvimento e refatoração, com definição de requisitos, direcionamento técnico, revisão e testes. O objetivo é compreender as soluções e evoluir tecnicamente. Os resultados e limites de validação são registrados abaixo.
+
+## Sistemas presentes no código
 
 - cidade com avenidas, bairros nos morros, ladeiras, escadas, feira e mirante; a expansão brasileira acrescenta 71 casas e comércios com fachadas, placas e vegetação
 - sistema de dinheiro, energia e reputação
@@ -23,7 +44,18 @@ Protótipo de jogo para Roblox, feito em Luau, com cidade, empregos, veículos, 
 - salvamento de carteira, banco, reputação, imóvel, lanches, turnos, entregas e recompensas de objetivos recebidas; status de salvamento no painel
 - atendentes decorativos na central, garagem, clube e mercadinho; pacote visível nas costas durante o transporte
 
+## Preparar o ambiente
+
+Os scripts disponíveis são voltados a Windows/PowerShell e requerem Python 3, Roblox Studio e os executáveis oficiais abaixo. As ferramentas e os arquivos gerados são ignorados pelo Git e precisam ser obtidos em uma clonagem nova.
+
+1. Baixe [Luau 0.737](https://github.com/luau-lang/luau/releases/tag/0.737) e extraia `luau.exe` e `luau-compile.exe` em `.tools/luau/`.
+2. Baixe [Rojo 7.7.0](https://github.com/rojo-rbx/rojo/releases/tag/v7.7.0) para Windows e coloque `rojo.exe` em `.tools/rojo/`.
+3. Na raiz do repositório, execute `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build.ps1` para compilar, testar e gerar `build/DowntownHustle.rbxlx`.
+4. Resolva a pendência de mapeamento de `VehicleUnits` descrita na visão técnica antes de testar o Play.
+
 ## Como testar no Roblox Studio
+
+O roteiro abaixo descreve o comportamento esperado após corrigir a integração. Os registros antigos de Studio são históricos e não validam a importação limpa da versão atual.
 
 1. No Roblox Studio, use **File → Open from File** e abra `build/DowntownHustle.rbxlx`.
 2. Pressione **Play**. A cidade é criada pelo servidor quando a simulação começa.
@@ -71,7 +103,7 @@ Para compilar todos os scripts, executar os testes e atualizar o arquivo, execut
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build.ps1
 ```
 
-O plugin Rojo 7.7.0 foi instalado no Studio desta máquina. Para reinstalá-lo, execute `.\.tools\rojo\rojo.exe plugin install`. Abra `build/DowntownHustle.rbxlx` no Studio e inicie o servidor local em um terminal:
+Para instalar o plugin Rojo 7.7.0 no seu Studio, execute `.\.tools\rojo\rojo.exe plugin install`. Abra `build/DowntownHustle.rbxlx` no Studio e inicie o servidor local em um terminal:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\serve.ps1
@@ -79,24 +111,24 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\serve.ps1
 
 No Studio, abra **Plugins → Rojo 7.7.0 → Rojo** e conecte a `localhost:34872`. O painel deve mostrar **DowntownHustle** e o botão **Disconnect**. Enquanto o servidor estiver ativo, alterações em `src` chegam ao editor. Se a porta já estiver em uso pelo servidor deste projeto, mantenha essa instância; não é preciso iniciar outra. A configuração segue o [formato oficial do Rojo](https://rojo.space/docs/v7/project-format/).
 
-Ao alterar a estrutura ou as propriedades em `default.project.json`, reinicie o servidor local e reconecte o plugin para aplicar a nova configuração. Esse procedimento foi necessário nesta máquina ao adicionar a orientação automática em `StarterGui`.
+Ao alterar a estrutura ou as propriedades em `default.project.json`, reinicie o servidor local e reconecte o plugin para aplicar a nova configuração. A orientação automática está configurada em `StarterGui`.
 
-As ferramentas locais em `.tools` foram obtidas das releases oficiais de [Rojo 7.7.0](https://github.com/rojo-rbx/rojo/releases/tag/v7.7.0) e [Luau 0.737](https://github.com/luau-lang/luau/releases/tag/0.737). Elas e o arquivo gerado não entram no controle de versão.
+Na validação local de 30/09/2026, as ferramentas em `.tools` foram obtidas das releases oficiais de [Rojo 7.7.0](https://github.com/rojo-rbx/rojo/releases/tag/v7.7.0) e [Luau 0.737](https://github.com/luau-lang/luau/releases/tag/0.737). Elas e o arquivo gerado não entram no controle de versão.
 
 ## Validação e limites desta versão
 
 - O comando de build requer Python e as ferramentas locais acima; ele compila todos os scripts Luau antes de gerar o arquivo.
 - As sete suítes usam `tests/luau_runner.py` para criar arquivos temporários em `build/tests` e removê-los ao terminar. Isso evita a restrição de acesso às pastas temporárias do Python 3.13 no ambiente de execução do Windows e permite rodar o Luau em caminhos com acentos.
-- Em 15/09/2026, a compilação, os 127 testes locais das sete suítes e a geração de `build/DowntownHustle.rbxlx` passaram com a expansão brasileira.
-- No Play de 15/09/2026, o Rojo estava conectado em `localhost:34872` e o mapa expandido carregou. `STUDIO_CITY_CHECK_OK`, executado no cliente sobre o mapa replicado, confirmou 19 ruas, 144 degraus, 71 construções, cinco destinos e `problems=[]`. `STUDIO_HUD_CHECK_OK` passou em Atividade e Cidade no viewport 1016×611, com área de rolagem de 258 px e cinco linhas de destinos. Marcar a garagem atualizou o indicador de direção e distância. A consulta da frota confirmou dez veículos de sete modelos, todos com chassi como raiz física e `UpVector.Y > 0.9`. Capturas e limites estão em [tests/STUDIO.md](tests/STUDIO.md).
+- Em 30/09/2026, a compilação, as 132 verificações locais das sete suítes e a geração de `build/DowntownHustle.rbxlx` passaram com Luau 0.737 e Rojo 7.7.0. A inspeção do build também confirmou a ausência do módulo `VehicleUnits`: gerar o arquivo e passar nos mocks não valida a inicialização no Studio.
+- Registro histórico preservado da documentação de 15/09/2026, não repetido nesta revisão: no Play, o Rojo estava conectado em `localhost:34872` e o mapa expandido carregou. `STUDIO_CITY_CHECK_OK`, executado no cliente sobre o mapa replicado, confirmou 19 ruas, 144 degraus, 71 construções, cinco destinos e `problems=[]`. `STUDIO_HUD_CHECK_OK` passou em Atividade e Cidade no viewport 1016×611, com área de rolagem de 258 px e cinco linhas de destinos. Marcar a garagem atualizou o indicador de direção e distância. A consulta da frota confirmou dez veículos de sete modelos, todos com chassi como raiz física e `UpVector.Y > 0.9`. As capturas citadas não estão versionadas; o relato e seus limites estão em [tests/STUDIO.md](tests/STUDIO.md).
 - Execute `python tests/run.py` para repetir os 35 testes de interações, rotas, carreira, prazo, renda, objetivos, integração entre atividades e bloqueio durante o carregamento.
 - Execute `python tests/run_player_data.py` para repetir os 17 testes de salvamento: normalização, migração de perfis antigos, leitura, gravação, falhas, duas sessões, reconexão, renovação atrasada, saída durante leitura e encerramento durante salvamento.
 - Execute `python tests/run_housing.py` para repetir os 11 testes de apartamento: dono, distância, carregamento, entrada, saída, descanso, reentrada, respawn e liberação de espaços.
 - Execute `python tests/run_jobs.py` para repetir os 24 testes de turnos: duração, reserva de energia, pagamento único, distância, cancelamento, morte, dois jogadores e intervalo.
 - Execute `python tests/run_inventory.py` para repetir os 11 testes de lanches: compra, consumo, limite, saldo, distância, intervalo, dois jogadores e bloqueio com dados indisponíveis.
 - Execute `python tests/run_objectives.py` para repetir os 17 testes de progressão, requisitos, resgate único, jogadores independentes e atualização do painel.
-- Execute `python tests/run_vehicles.py` para repetir os 12 testes de catálogo, entrada, autorização de controles, limites, plano de direção em rampas, recuperação e limpeza do serviço. Essa suíte integra o build. Os 127 testes usam objetos simulados em Luau; não executam física, rede, controles de assento da engine nem acessam o DataStore real.
-- Evidências históricas, anteriores à expansão: em 10–11/09/2026, o Studio confirmou sincronização dos dez scripts da época, trabalho, lanches, objetivos, entrega ao clube, direção da antiga SportsCar e recuperação de capotamento preparado por comando. No iPhone XR, o HUD de duas abas e os controles de toque passaram em retrato e paisagem. A abertura de 15/09/2026 anterior à expansão confirmou cidade, personagem e HUD. Esses registros não validam os sete modelos atuais nem a aba Cidade; consulte [tests/STUDIO.md](tests/STUDIO.md).
+- Execute `python tests/run_vehicles.py` para repetir os 17 testes de conversão de unidades, catálogo, entrada, autorização de controles, aceleração, frenagem, marcha à ré, limites, plano de direção em rampas, recuperação e limpeza do serviço. Essa suíte integra o build. As 132 verificações usam objetos simulados em Luau; não executam física, rede, controles de assento da engine nem acessam o DataStore real.
+- Relatos históricos preservados, não revalidados nesta revisão, anteriores à expansão: em 10–11/09/2026, o Studio confirmou sincronização dos dez scripts da época, trabalho, lanches, objetivos, entrega ao clube, direção da antiga SportsCar e recuperação de capotamento preparado por comando. No iPhone XR, o HUD de duas abas e os controles de toque passaram em retrato e paisagem. A abertura de 15/09/2026 anterior à expansão confirmou cidade, personagem e HUD. Esses registros não validam os sete modelos atuais nem a aba Cidade; consulte [tests/STUDIO.md](tests/STUDIO.md).
 - Os checks de mapa e HUD no Studio são separados das sete suítes locais. Entrada e direção dos veículos atuais, percursos pelas ladeiras, Cidade por toque, colisões, transporte do pacote no carro, outros aparelhos e multiplayer ainda precisam de validação na versão atual.
 - A persistência real ainda precisa de teste em uma experiência publicada; o fallback no Studio mantém o progresso apenas durante aquela sessão quando a API está indisponível.
 - O primeiro aluguel chega 60 segundos após a compra, com verificação a cada segundo no servidor.
@@ -115,6 +147,7 @@ Se uma renovação estiver aguardando resposta quando o prazo da sessão vencer,
 
 ## Estrutura principal
 
+- `src/ReplicatedStorage/VehicleUnits.lua` — conversão de velocidade; inclusão no mapeamento Rojo pendente
 - `src/ServerScriptService/GameServer.server.lua` — lógica da cidade, empregos e veículos
 - `src/ServerScriptService/CityBuilder.lua` — construção das ruas, prédios e cenário
 - `src/ServerScriptService/BrazilianCity.lua` — bairros, relevo, comércios, garagem e cinco destinos da expansão
@@ -134,6 +167,7 @@ Se uma renovação estiver aguardando resposta quando o prazo da sessão vencer,
 
 ## Melhorias futuras recomendadas
 
+- corrigir o mapeamento Rojo de `VehicleUnits` e testar uma importação limpa no Studio
 - sistema de policiais e wanted level
 - validação de persistência e multiplayer no Studio
 - mais imóveis e lojas
