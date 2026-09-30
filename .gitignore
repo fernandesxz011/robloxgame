@@ -1,3 +1,10 @@
 .tools/
 build/
 __pycache__/
+
+# Credenciais e configuracoes locais (nao remove arquivos ja versionados)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
